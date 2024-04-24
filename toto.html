@@ -1,0 +1,147 @@
+<html>
+
+<head>
+    <title>간단 메모 애플리케이션</title>
+    <meta charset="UTF-8" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+        }
+
+        .container {
+            width: 256px;
+            margin: auto;
+        }
+
+        button {
+            padding: 5px 10px;
+        }
+
+        input,
+        #add-text[type="text"] {
+            padding: 5px 0
+        }
+
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 id="title">간단 메모</h1>
+        <input id="add-text" />
+        <button id="add-button">추가</button>
+        <div class="container">
+            <p>메모 목록</p>
+            <ul id="memo-list"></ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        const addButton = document.getElementById('add-button')
+        const addText = document.getElementById('add-text')
+        const memoList = document.getElementById('memo-list')
+        addText.focus()
+
+        addButton.addEventListener('click', function () {
+            const text = addText.value
+            addText.value = ''
+
+            const li = document.createElement('li')
+            li.classList.add('flex')
+            const p = document.createElement('p')
+
+            const div = document.createElement('div')
+            const deleteButton = document.createElement('button')
+            const editButton = document.createElement('button')
+
+            p.textContent = text
+            deleteButton.textContent = '삭제'
+            deleteButton.classList.add('delete-button')
+            editButton.textContent = '수정'
+            editButton.classList.add('edit-button')
+
+            li.appendChild(p)
+            li.appendChild(div)
+            div.appendChild(editButton)
+            div.appendChild(deleteButton)
+            memoList.appendChild(li)
+
+            // 메모 삭제
+            deleteButton.addEventListener('click', function () {
+                //li 요소의 parentNode (즉, ul 요소)에서 li 요소를 제거합니다.
+                li.parentNode.removeChild(li)
+            })
+
+            // 메모 수정
+            editButton.addEventListener('click', function () {
+                const currentText = p.textContent
+                console.log(currentText)
+
+                const editInput = document.createElement('input')
+                editInput.type = 'text'
+                editInput.classList.add('edit-input')
+                editInput.value = currentText//입력된 input값 input에 표시
+
+                const saveButton = document.createElement('button')
+                saveButton.textContent = '저장'
+                saveButton.classList.add('save-button')
+
+                // 이전 버튼 숨기고 새 입력 필드와 저장 버튼 추가
+                p.style.display = 'none'
+                editButton.style.display = 'none'
+                deleteButton.style.display = 'none'
+                div.appendChild(editInput)
+                div.appendChild(saveButton)
+
+                // 저장 버튼 클릭 이벤트 처리
+                saveButton.addEventListener('click', function () {
+                    const newText = editInput.value
+
+                    // 수정된 내용 메모에 반영
+                    p.textContent = newText
+                    p.style.display = 'block'
+
+                    // 추가된 입력 필드와 저장 버튼 제거
+                    // parentNode는 li 요소를 참조
+                    editInput.parentNode.removeChild(editInput)
+                    saveButton.parentNode.removeChild(saveButton)
+
+                    // 숨겼던 p, 수정, 삭제 버튼을 다시 표시
+                    editButton.style.display = 'inline-block'
+                    deleteButton.style.display = 'inline-block'
+
+                })
+            })
+        })
+        function saveMemo(text) {
+            // 메모 목록을 로컬 스토리지에서 불러옵니다.
+            let memos = JSON.parse(localStorage.getItem('memos')) || [];
+            // 새 메모를 배열에 추가합니다.
+            memos.push(text);
+            // 변경된 메모 목록을 로컬 스토리지에 저장합니다.
+            localStorage.setItem('memos', JSON.stringify(memos));
+        }
+
+        // 메모 목록을 로컬 스토리지에서 불러옵니다.
+        let memos = JSON.parse(localStorage.getItem('memos')) || [];
+        // 불러온 메모를 화면에 표시합니다.
+        memos.forEach(function (text) {
+            addMemoToDOM(text); // addMemoToDOM은 DOM에 메모를 추가하는 기존의 함수입니다.
+        });
+    </script>
+</body>
+
+</html>
